@@ -5,6 +5,7 @@ RAW_GZ=raw/results.tar.gz
 DATA_DIR=data
 SRC_DIR=src
 OUTPUT_DIR=figures
+KEEP='.gitkeep'
 
 # Scripts
 FIG1_SRC=${SRC_DIR}/fig1_comp_time.R
@@ -27,7 +28,7 @@ all: $(FIG1_OUTPUT)
 .PHONY: clean
 clean:
 	@echo "Cleaning files in ${OUTPUT_DIR} ..."
-	@rm -f ${OUTPUT_DIR}/*
+	@find ${OUTPUT_DIR} ! -name ${KEEP} -type f -exec rm -f {} +
 #untar: $(RAW_GZ)
 #	@tar -xf $(RAW_GZ) \
 #	--transform="s/.*\///" \
