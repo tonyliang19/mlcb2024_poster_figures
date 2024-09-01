@@ -1,11 +1,9 @@
-# load library
-
 doc <- "
 
 This script is used to create figure 1 of performance evaluation
 
 Usage:
-  fig1_comp_time.R [options]
+  fig_performance_evaluation.R [options]
 
 Options:
  --csv=CSV              File to load the csv
