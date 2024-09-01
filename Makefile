@@ -45,7 +45,7 @@ $(FIG1_OUTPUT): ${FIG1_SRC} ${FIG1_CSV}
 		--real_out $(FIG_REAL_OUT) \
 		--sim_out $(FIG_SIM_OUT)
 $(FIG2_OUTPUT): ${FIG2_SRC} ${FIG2_TRACE} ${FIG2_METADATA}
-	echo -e "Plotting figure of computational time\n"
+	@echo -e "Plotting figure of computational time\n"
 	Rscript $(FIG2_SRC) \
 		--metadata ${FIG2_METADATA} \
 		--trace ${FIG2_TRACE} \
