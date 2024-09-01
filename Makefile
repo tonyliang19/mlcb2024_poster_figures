@@ -8,7 +8,7 @@ OUTPUT_DIR=figures
 KEEP='.gitkeep'
 
 # Scripts
-FIG1_SRC=${SRC_DIR}/fig1_comp_time.R
+FIG1_SRC=${SRC_DIR}/fig_performance_evaluation.R
 #FIG2_SRC=${SRC_DIR}/fig2.R
 # Input data files
 FIG3_CSV=${DATA_DIR}/all_feature_selection_results.csv
@@ -21,8 +21,10 @@ FIG2_METADATA=${DATA_DIR}/parsed_metadata.csv
 FIG_REAL_OUT=${OUTPUT_DIR}/fig_performance_evaluation.png
 FIG_SIM_OUT=${OUTPUT_DIR}/fig_simulated_performance.png
 FIG1_OUTPUT=$(FIG_REAL_OUT) $(FIG_SIM_OUT)
+# For computational time
+FIG_COMP_TIME=${OUTPUT_DIR}/fig_computational_time.png
 
-
+# Main target starts here
 all: $(FIG1_OUTPUT)
 
 .PHONY: clean
@@ -34,7 +36,8 @@ clean:
 #	--transform="s/.*\///" \
 #	--directory ${DATA_DIR}
 
-#$(FIG_REAL_OUT) $(FIG_SIM_OUT): ${FIG1_SRC} ${FIG1_CSV}
+
+# FIGURE 1 Performance Evaluation
 $(FIG1_OUTPUT): ${FIG1_SRC} ${FIG1_CSV}
 	@echo -e "Plotting figures of performance evaluation ... \n"
 	Rscript $(FIG1_SRC) \
