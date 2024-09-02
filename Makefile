@@ -25,7 +25,9 @@ FIG1_OUTPUT=$(FIG_REAL_OUT) $(FIG_SIM_OUT)
 FIG_COMP_TIME=${OUTPUT_DIR}/fig_computational_time.png
 FIG2_OUTPUT=$(FIG_COMP_TIME)
 # Main target starts here
-all: $(FIG1_OUTPUT) $(FIG2_OUTPUT)
+# All the outputs
+OUTPUTS=$(FIG1_OUTPUT) $(FIG2_OUTPUT)
+all: $(OUTPUTS)
 
 .PHONY: clean
 clean:
@@ -39,12 +41,14 @@ clean:
 
 # FIGURE 1 Performance Evaluation
 $(FIG1_OUTPUT): ${FIG1_SRC} ${FIG1_CSV}
+	@echo ""
 	@echo -e "Plotting figures of performance evaluation ... \n"
 	Rscript $(FIG1_SRC) \
 		--csv $(FIG1_CSV) \
 		--real_out $(FIG_REAL_OUT) \
 		--sim_out $(FIG_SIM_OUT)
 $(FIG2_OUTPUT): ${FIG2_SRC} ${FIG2_TRACE} ${FIG2_METADATA}
+	@echo ""
 	@echo -e "Plotting figure of computational time\n"
 	Rscript $(FIG2_SRC) \
 		--metadata ${FIG2_METADATA} \
