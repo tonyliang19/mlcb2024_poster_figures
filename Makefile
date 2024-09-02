@@ -10,6 +10,7 @@ KEEP='.gitkeep'
 # Scripts
 FIG1_SRC=${SRC_DIR}/fig_performance_evaluation.R
 FIG2_SRC=${SRC_DIR}/fig_computational_time.R
+FIG3_SRC=${SRC_DIR}/fig_feature_selection.R
 # Input data files
 FIG3_CSV=${DATA_DIR}/all_feature_selection_results.csv
 FIG1_CSV=${DATA_DIR}/metrics.csv
@@ -24,9 +25,13 @@ FIG1_OUTPUT=$(FIG_REAL_OUT) $(FIG_SIM_OUT)
 # For computational time
 FIG_COMP_TIME=${OUTPUT_DIR}/fig_computational_time.png
 FIG2_OUTPUT=$(FIG_COMP_TIME)
+# For feature selection
+FIG_FEAT_SELECTION=${OUTPUT_DIR}/fig_feature_selection_weights.png
+FIG3_OUTPUT=${FIG_FEAT_SELECTION}
+
 # Main target starts here
 # All the outputs
-OUTPUTS=$(FIG1_OUTPUT) $(FIG2_OUTPUT)
+OUTPUTS=$(FIG1_OUTPUT) $(FIG2_OUTPUT) $(FIG3_OUTPUT)
 all: $(OUTPUTS)
 
 .PHONY: clean
@@ -54,4 +59,10 @@ $(FIG2_OUTPUT): ${FIG2_SRC} ${FIG2_TRACE} ${FIG2_METADATA}
 		--metadata ${FIG2_METADATA} \
 		--trace ${FIG2_TRACE} \
 		--output ${FIG_COMP_TIME}
-#fig3: fig_feat_weights.png
+
+$(FIG3_OUTPUT): ${FIG3_SRC} ${FIG3_CSV}
+	@echo ""
+	@echo -e "Plotting figure of feature selection comparison... \n"
+	Rscript ${FIG3_SRC} \
+		--csv ${FIG3_CSV} \
+		--output ${FIG_FEAT_SELECTION}
