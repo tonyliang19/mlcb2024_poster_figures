@@ -93,7 +93,7 @@ wrangle_data <- function(df) {
 # ==================================================
 # First load data and clean it for plotting
 
-input_path <- "data/metrics.csv"
+#input_path <- "data/metrics.csv"
 
 clean_df <- read.csv(input_path) %>%
   as_tibble() %>%
@@ -105,6 +105,7 @@ clean_df <- read.csv(input_path) %>%
 fig1_real_df <- clean_df %>%
   filter(is_simulated == "no")
 
+
 # This function has the details of making heatmap to ilustrate
 # ranking of methods along the datasets
 # I.e. Given method m1, m2, m3, m4 and dataset d1, d2,d3
@@ -115,6 +116,14 @@ plot_fig1_real <- function(
     heatmap_title = "Mean AUC (5-fold CV) ranking in real datasets") {
   # Then now the figure for mean auc ranking in real data
   auc_matrix <- fig1_real_df %>%
+    select(method, dataset, auc_mean) %>%
+    pivot_wider(names_from = dataset, values_from = auc_mean) %>%
+    arrange(method) %>%
+    select(order(colnames(.))) %>%
+    tibble::column_to_rownames(var="method") %>%
+    as.matrix()
+
+  rank_matrix <- fig1_real_df %>%
     select(method, dataset, ranking) %>%
     pivot_wider(names_from = dataset, values_from = ranking) %>%
     arrange(method) %>%
@@ -122,9 +131,9 @@ plot_fig1_real <- function(
     tibble::column_to_rownames(var="method") %>%
     as.matrix()
 
-
-  methods <- rownames(auc_matrix)
-  datasets <- colnames(auc_matrix)
+  #auc_matrix
+  methods <- rownames(rank_matrix)
+  datasets <- colnames(rank_matrix)
 
   # Assign the colors
   # For the method to use default Paired
@@ -139,56 +148,70 @@ plot_fig1_real <- function(
   # Column wise
   col_ha <- HeatmapAnnotation(
     Method = methods,
-    Dataset = datasets,
+    #Dataset = datasets,
     col = list(
-      Dataset = dataset_colors,
+      #Dataset = dataset_colors,
       Method = method_colors
     ),
     show_annotation_name = FALSE
   )
 
+  colnames(rank_matrix)
+
   # Row wise
   row_ha <- rowAnnotation(
     Dataset = datasets,
-    Method = methods,
+    #Method = methods,
     col = list(
-      Method = method_colors,
+      #Method = method_colors
       Dataset = dataset_colors
     ),
-    show_legend = F,
+    show_legend = T,
     show_annotation_name = FALSE
   )
 
-
   # Plot the heatmap
-  col_fun <- viridis::cividis(256)
+  #col_fun <- viridis::cividis(256)
+  #RColorBrewer::brewer.pal(n=11, name="RdYlBu")
+  col_fun = circlize::colorRamp2(c(1, 3 , 6), c("white", "#FFCCCC", "#8B0000"))
   #col_fun <- viridis::mako(256)
   #col_fun <- viridis::rocket(256)
   #col_fun <- circlize::colorRamp2()
   ht <- Heatmap(
-    auc_matrix,
+    t(rank_matrix),
     col = col_fun,
-    border = F,
+    border = T,
     column_title = heatmap_title,
     column_title_gp = gpar(fontsize=fontsize, fontface="bold"),
+    row_names_rot = 0,
+    column_names_rot = 45,
+    #column_labels = rownames(rank_matrix),
     row_title = NULL,
-    cluster_rows = F,
+    cluster_rows = T,
     column_dend_reorder = T,
+    row_dend_reorder = T,
     show_parent_dend_line = F,
-    row_labels = datasets,
+    #row_labels = datasets,
     column_dend_height = unit(2.5, "cm"),
-    show_row_names = F, show_column_names = F,
+    show_row_names = T,  show_column_names = T,
+    cell_fun = function(j, i, x, y, width, height, fill) {
+      grid.text(sprintf("%.2f", t(auc_matrix)[i, j]), x, y,
+                gp = gpar(fontsize = 10,
+                          col="darkblue",
+                          fontface="bold"
+                          )
+                )
+      },
     # Assign legend
     heatmap_legend_param = list(
       title = "Ranking",
       legend_direction = "horizontal",
       at = seq(1, 6, 1)
     ),
-    top_annotation = col_ha,
-    right_annotation = row_ha
+    #top_annotation = col_ha,
+    #right_annotation = row_ha
   )
 
-  ht
   heatmap_p <- grid.grabExpr(
     #draw(ht, heatmap_legend_side="bottom", annotation_legend_side="right",
     #     legend_grouping = "original")
