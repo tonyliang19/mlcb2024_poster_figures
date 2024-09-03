@@ -302,6 +302,7 @@ plot_sim_heatmap <- function(wide_ranking_df, fontsize=12, method_palette="Paire
     row_title = NULL,
     column_title = heatmap_title,
     column_title_gp = gpar(fontsize=fontsize, fontface="bold"),
+    column_dend_height = unit(2.5, "cm"),
     cluster_rows = FALSE,
     cluster_columns = TRUE,
     col = col_fun,
@@ -327,13 +328,15 @@ plot_sim_heatmap <- function(wide_ranking_df, fontsize=12, method_palette="Paire
 
 # Lastly plot it
 # Then plot it
-real_data_heatmap_plot <- plot_real_heatmap(wide_ranking_df, fontsize = fontsize)
-sim_data_heatmap_plot <- plot_sim_heatmap(wide_ranking_df, fontsize = fontsize)
+real_data_heatmap_plot <- plot_real_heatmap(wide_ranking_df, fontsize = fontsize,
+                                            heatmap_title = NULL)
+sim_data_heatmap_plot <- plot_sim_heatmap(wide_ranking_df, fontsize = fontsize,
+                                          heatmap_title = NULL)
 # And save them to disk
 ggsave(real_output_path, plot = real_data_heatmap_plot,
        width = width, height = height, device=device, dpi=dpi)
 ggsave(sim_output_path, plot = sim_data_heatmap_plot,
-       width = width, height = height, device=device, dpi=dpi)
+       width = width, height = height + 2, device=device, dpi=dpi)
 
 message("Saved image of ", width, " x ", height, " to ", real_output_path)
 message("Saved image of ", width, " x ", height, " to ", sim_output_path)

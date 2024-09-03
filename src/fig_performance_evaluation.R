@@ -205,7 +205,8 @@ heatmap_fig_real <- plot_fig1_real(
   fig1_real_df = fig1_real_df,
   fontsize = text_size,
   method_palette = method_palette,
-  dataset_palette = dataset_palette
+  dataset_palette = dataset_palette,
+  heatmap_title = NULL
 )
 
 # Save the fig1 heatmap of real data to disk
