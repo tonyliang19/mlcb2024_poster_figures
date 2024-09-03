@@ -11,6 +11,8 @@ Options:
  --sim_out=SIM_OUT      Path to write out performance auc of sim datasets
  --width=WIDTH          Width of the graph [default: 7]
  --height=height        Height of the graph [default: 7]
+ --device=DEVICE        Device to print out [default: png]
+ --dpi=DPI              Dots per inch [default: 300]
 "
 
 # Parse doc
@@ -28,13 +30,15 @@ suppressPackageStartupMessages(library(ComplexHeatmap))
 input_path <- here(opt$csv)
 real_output_path <- here(opt$real_out)
 sim_output_path  <- here(opt$sim_out)
-width <- as.numeric(opt$width)
-height <- as.numeric(opt$height)
-
 # Plot params
 method_palette <- "Paired"
 dataset_palette <- "Pastel1"
 text_size <- 12
+width <- as.numeric(opt$width)
+height <- as.numeric(opt$height)
+device <- opt$device
+dpi <- as.numeric(opt$dpi)
+
 
 
 # Verbose message
@@ -205,7 +209,8 @@ heatmap_fig_real <- plot_fig1_real(
 
 # Save the fig1 heatmap of real data to disk
 ggsave(real_output_path, plot=heatmap_fig_real,
-       width = width, height = height, create.dir = TRUE)
+       width = width, height = height, device=device, dpi=dpi,
+       create.dir = TRUE)
 message("Saved image of ", width, " x ", height, " to ", real_output_path)
 
 
@@ -254,7 +259,6 @@ plot_fig1_sim <- function(
   names(effect_labels) <- sim_df$effect |> unique()
   corr_labels <- paste0("Cor = ", sim_df$corr |> unique())
   names(corr_labels) <- sim_df$corr |> unique()
-
   # Then the plotting
   p <- sim_df %>%
     ggplot(aes(x=method, y=auc_mean, fill=method)) +
@@ -272,6 +276,10 @@ plot_fig1_sim <- function(
       # Rotate text of methods names
       #axis.text.x = element_text(angle = 45, hjust=1),
       axis.text.x = element_blank(),
+      axis.text.y = element_text(
+        size = text_size
+      ),
+      axis.title = element_text(size = text_size + 2),
       axis.ticks.x = element_blank(),
       strip.text.x = element_text(
         size = text_size, color = "red", face = "bold.italic"
@@ -281,9 +289,11 @@ plot_fig1_sim <- function(
       strip.text.y = element_text(
         size = text_size, color = "red", face = "bold.italic"
       ),
+      legend.title = element_text(size = text_size + 2),
+      legend.text = element_text(size = text_size),
       legend.position = "bottom"
     ) +
-    guides(fill = guide_legend(nrow = 1)) +
+    guides(fill = guide_legend(nrow = 2)) +
     # Lastly the labels
     labs(x=x_lab, fill=x_lab, y = y_lab)
   return(p)
@@ -291,7 +301,9 @@ plot_fig1_sim <- function(
 
 sim_facet_boxplot <- plot_fig1_sim(fig1_sim_df = fig1_sim_df)
 
+sim_facet_boxplot
 # Save the fig1 boxplot of sim data to disk
 ggsave(sim_output_path, plot=sim_facet_boxplot,
-       width = width, height = height, create.dir = TRUE)
+       width = width, height = height, device=device,
+       dpi = dpi, create.dir = TRUE)
 message("Saved image of ", width, " x ", height, " to ", sim_output_path)
