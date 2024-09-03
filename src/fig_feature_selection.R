@@ -254,6 +254,7 @@ plot_sim_heatmap <- function(wide_ranking_df, fontsize=12, method_palette="Paire
       )
     )
   )
+
   # Colors for methods
   methods <- colnames(heatmap_matrix)
   method_colors <- RColorBrewer::brewer.pal(n=length(methods), method_palette)

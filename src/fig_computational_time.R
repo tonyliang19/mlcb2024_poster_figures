@@ -76,15 +76,23 @@ wrangle_metadata <- function(metadata_df) {
              map_dbl(~ sum(as.numeric(.x)))) %>%
     mutate(dataset_dim = sample_size * total_number_feature) %>%
     select(dataset, omics_names, sample_size,
-           dataset_dim, is_simulated, positive_prop)
+           dataset_dim, is_simulated, positive_prop, feat_dimensions)
 }
 
 # ========================
 # First handle the metadata
-#metadata_path <- "data/parsed_metadata.csv"
+metadata_path <- "data/parsed_metadata.csv"
 metadata_df <- read.csv(metadata_path) %>%
   as_tibble() %>%
   wrangle_metadata()
+
+
+# library(knitr)
+# metadata_df %>%
+#   filter(is_simulated == 0) %>%
+#   select(dataset, omics_names, sample_size, feat_dimensions, positive_prop) %>%
+#   kable()
+
 
 
 # ================================
@@ -191,7 +199,7 @@ computation_time_plot <- plot_df %>%
   geom_boxplot(outlier.color = "red", outlier.fill="red") +
   scale_y_log10(labels = scales::label_log()) +
   scale_fill_brewer(palette=method_palette) +
-  labs(x = "Dataset Size", y = "Computation time (seconds)", fill = "Method") +
+  labs(x = "Dataset Size", y = "Computation time in seconds (log scale)", fill = "Method") +
   theme_classic() +
   theme(
     # Make sizing
