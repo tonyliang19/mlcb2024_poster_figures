@@ -11,6 +11,8 @@ Options:
  --output=OUTPUT        Path to write out computational time
  --width=WIDTH          Width of the graph [default: 7]
  --height=height        Height of the graph [default: 7]
+ --device=DEVICE        Device to print out [default: png]
+ --dpi=DPI              Dots per inch [default: 300]
 "
 
 # Load libraries
@@ -30,7 +32,11 @@ trace_path <- opt$trace
 # Plotting params
 width <- as.numeric(opt$width)
 height <- as.numeric(opt$height)
+device <- opt$device
+dpi <- as.numeric(opt$dpi)
+text_size <- 12
 method_palette <- "Paired"
+
 
 # Custom functions
 toSeconds <- function(x) {
@@ -187,10 +193,17 @@ computation_time_plot <- plot_df %>%
   scale_fill_brewer(palette=method_palette) +
   labs(x = "Dataset Size", y = "Computation time (seconds)", fill = "Method") +
   theme_classic() +
-  theme(legend.position = "bottom") +
-  guides(fill=guide_legend(nrow=1))
-
+  theme(
+    # Make sizing
+    axis.text = element_text(size = text_size),
+    axis.title = element_text(size = text_size + 2),
+    legend.title = element_text(size = text_size + 2),
+    legend.text = element_text(size = text_size),
+    legend.position = "bottom"
+  ) +
+  guides(fill=guide_legend(nrow=2))
 # Lastly save it
 ggsave(output_path, plot=computation_time_plot,
-       width=width, height=height, create.dir = TRUE)
+       width=width, height=height, device=device, dpi=dpi,
+       create.dir = TRUE)
 message("Saved image of ", width, " x ", height, " to ", output_path)
