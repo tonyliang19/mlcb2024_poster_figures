@@ -147,7 +147,11 @@ plot_real_heatmap <- function(
   real_ht <- Heatmap(
     cor_mat,
     col = col_fun,
-    name = "Spearman Correlation",
+    heatmap_legend_param = list(
+      title = "Spearman correlation",
+      legend_direction = "horizontal"
+    ),
+    #name = "Spearman Correlation",
     row_title = NULL,
     column_title = heatmap_title,
     column_title_gp = gpar(fontsize=fontsize, fontface="bold"),
@@ -155,12 +159,12 @@ plot_real_heatmap <- function(
     column_km = 2,
     row_km = 2,
     border = T,
+    column_dend_height = unit(2, "cm"),
     cluster_rows = T,
     cluster_columns =  T,
     row_dend_side = 'left',
     row_dend_reorder = T,
-    column_dend_height = unit(2, "cm"),
-    row_dend_width = unit(2, "cm"),
+    row_dend_width = unit(1, "cm"),
     column_dend_reorder = T,
     column_names_rot = 45,
     show_row_names = F,
@@ -169,6 +173,8 @@ plot_real_heatmap <- function(
     top_annotation = col_ha,
     right_annotation = row_ha
   )
+
+  real_ht
   real_data_heatmap_plot <- grid.grabExpr(
     draw(real_ht, merge_legends = TRUE,
          heatmap_legend_side = "bottom",
@@ -181,7 +187,8 @@ plot_real_heatmap <- function(
 # This function plots heatmap of simulated data feature selection ranking
 # stratified by effect and correlation
 plot_sim_heatmap <- function(wide_ranking_df, fontsize=12, method_palette="Paired",
-                             effect_palette="Dark2", corr_palette="Pastel2") {
+                             effect_palette="Dark2", corr_palette="Pastel2",
+                             heatmap_title="Ranking feature weights on simulated data\nstratified by effect and correlation") {
   # Extract relevant parameter\s
   wide_data <- wide_ranking_df %>%
     filter(is_simulated == "simulated") %>%
@@ -269,7 +276,8 @@ plot_sim_heatmap <- function(wide_ranking_df, fontsize=12, method_palette="Paire
   sim_ht <- Heatmap(
     heatmap_matrix,
     heatmap_legend_param = list(
-      title = "Ranking"
+      title = "Ranking",
+      legend_direction = "horizontal"
     ),
     #row_title = "Cluster %s | %s",
     #row_title = "Cluster %s",
@@ -287,11 +295,12 @@ plot_sim_heatmap <- function(wide_ranking_df, fontsize=12, method_palette="Paire
     #              "", "Cluster 2", "",
     #              "", "", ""),
     row_title = NULL,
-    column_title = "Ranking heatmap on simulated datasets\nstratified by effect and correlation",
+    column_title = heatmap_title,
     column_title_gp = gpar(fontsize=fontsize, fontface="bold"),
     cluster_rows = FALSE,
     cluster_columns = TRUE,
     col = col_fun,
+    show_parent_dend_line = F,
     row_split = interaction(wide_data$effect, wide_data$corr),
     #row_split = paste("effect", wide_data$effect, "- corr:", wide_data$corr) ,
     right_annotation = col_annotations,
@@ -300,6 +309,7 @@ plot_sim_heatmap <- function(wide_ranking_df, fontsize=12, method_palette="Paire
     show_column_names = F,
     name = "Method Values",
   )
+
   sim_data_heatmap_plot <- grid.grabExpr(
     draw(sim_ht, merge_legends = TRUE,
          heatmap_legend_side = "bottom",

@@ -70,6 +70,14 @@ wrangle_data <- function(df) {
         TRUE ~ "no"
       )
     ) %>%
+    # Rename method names
+    mutate(
+      method = case_when(
+        str_detect(method, "mofa") ~ "mofa + glmnet",
+        str_detect(method, "sgcca") ~ "sgcca + lda",
+        TRUE ~ method
+      )
+    ) %>%
     select(
       method, dataset, ranking,
       auc_mean, auc_sd, f1_score_mean, f1_score_sd, is_simulated
@@ -91,10 +99,7 @@ clean_df <- read.csv(input_path) %>%
 
 # For the real data uses heatmap showing mean auc and rank them
 fig1_real_df <- clean_df %>%
-  filter(is_simulated == "no") %>%
-  # Rename the - to _ in dataset
-  mutate(dataset = str_replace(dataset, pattern="-", replacement="_"))
-
+  filter(is_simulated == "no")
 
 # This function has the details of making heatmap to ilustrate
 # ranking of methods along the datasets
@@ -102,13 +107,16 @@ fig1_real_df <- clean_df %>%
 # The rank in d1 could be m1 = 1, m2 = 4, m3 = 2, m4 = 3, where m2 is the best in d1
 # The rank in d2 could be m1 = 3, m2 = 1, m3 = 2, m4 = 4, where m4 is the best in d2
 plot_fig1_real <- function(
-    fig1_real_df, method_palette="Paired", dataset_palette="Pastel1") {
+    fig1_real_df, fontsize=12, method_palette="Paired", dataset_palette="Pastel1",
+    heatmap_title = "Mean AUC (5-fold CV) ranking in real datasets") {
   # Then now the figure for mean auc ranking in real data
   auc_matrix <- fig1_real_df %>%
     select(method, dataset, ranking) %>%
     pivot_wider(names_from = dataset, values_from = ranking) %>%
-    column_to_rownames(var="method") %>%
+    arrange(method) %>%
+    tibble::column_to_rownames(var="method") %>%
     as.matrix()
+
 
   methods <- rownames(auc_matrix)
   datasets <- colnames(auc_matrix)
@@ -118,37 +126,52 @@ plot_fig1_real <- function(
   method_colors <- RColorBrewer::brewer.pal(n=length(methods), method_palette)
   names(method_colors) <- methods
   # For the dataset to use default Pastel1
-  dataset_colors <- RColorBrewer::brewer.pal(n=length(datasets), dataset_palette)
+  dataset_colors <- RColorBrewer::brewer.pal(n=256, dataset_palette) %>% tail(n=length(datasets))
   names(dataset_colors) <- datasets
 
   # Then annotations of the heatmap to use
 
   # Column wise
   col_ha <- HeatmapAnnotation(
+    Method = methods,
     Dataset = datasets,
     col = list(
-      Dataset = dataset_colors
+      Dataset = dataset_colors,
+      Method = method_colors
     ),
     show_annotation_name = FALSE
   )
 
   # Row wise
   row_ha <- rowAnnotation(
+    Dataset = datasets,
     Method = methods,
     col = list(
-      Method = method_colors
+      Method = method_colors,
+      Dataset = dataset_colors
     ),
-    show_annotation_name = F
+    show_legend = F,
+    show_annotation_name = FALSE
   )
 
 
   # Plot the heatmap
-
-  heatmap_col <- viridis::viridis(256)
+  col_fun <- viridis::cividis(256)
+  #col_fun <- viridis::mako(256)
+  #col_fun <- viridis::rocket(256)
+  #col_fun <- circlize::colorRamp2()
   ht <- Heatmap(
     auc_matrix,
-    col = heatmap_col,
-    km = 3,
+    col = col_fun,
+    border = F,
+    column_title = heatmap_title,
+    column_title_gp = gpar(fontsize=fontsize, fontface="bold"),
+    row_title = NULL,
+    cluster_rows = F,
+    column_dend_reorder = T,
+    show_parent_dend_line = F,
+    row_labels = datasets,
+    column_dend_height = unit(2.5, "cm"),
     show_row_names = F, show_column_names = F,
     # Assign legend
     heatmap_legend_param = list(
@@ -159,23 +182,29 @@ plot_fig1_real <- function(
     top_annotation = col_ha,
     right_annotation = row_ha
   )
-  return(ht)
+
+  ht
+  heatmap_p <- grid.grabExpr(
+    #draw(ht, heatmap_legend_side="bottom", annotation_legend_side="right",
+    #     legend_grouping = "original")
+    draw(ht, merge_legends = TRUE,
+    heatmap_legend_side = "bottom",
+    annotation_legend_side = "bottom")
+  )
+  return(heatmap_p)
 }
 
 # Draw the heatmap
-ht <- plot_fig1_real(
+
+heatmap_fig_real <- plot_fig1_real(
   fig1_real_df = fig1_real_df,
+  fontsize = text_size,
   method_palette = method_palette,
-  dataset_palette = dataset_palette)
-
-
-
-heatmap_p <- grid.grabExpr(
-  draw(ht, heatmap_legend_side="bottom", annotation_legend_side="right",
-       legend_grouping = "original")
+  dataset_palette = dataset_palette
 )
+
 # Save the fig1 heatmap of real data to disk
-ggsave(real_output_path, plot=heatmap_p,
+ggsave(real_output_path, plot=heatmap_fig_real,
        width = width, height = height, create.dir = TRUE)
 message("Saved image of ", width, " x ", height, " to ", real_output_path)
 
