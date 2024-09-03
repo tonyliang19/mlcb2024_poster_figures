@@ -26,4 +26,4 @@ Sep 5-6 @Seattle University of Washington
 
 **Ranking feature weights on simulated datasets stratified by effect and correlation**
 
-![](figures/fig_feature_selection_sim_rank.png
+![](figures/fig_feature_selection_sim_rank.png)
