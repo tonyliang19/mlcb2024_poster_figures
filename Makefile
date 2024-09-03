@@ -26,8 +26,9 @@ FIG1_OUTPUT=$(FIG_REAL_OUT) $(FIG_SIM_OUT)
 FIG_COMP_TIME=${OUTPUT_DIR}/fig_computational_time.png
 FIG2_OUTPUT=$(FIG_COMP_TIME)
 # For feature selection
-FIG_FEAT_SELECTION=${OUTPUT_DIR}/fig_feature_selection_weights.png
-FIG3_OUTPUT=${FIG_FEAT_SELECTION}
+FIG_FEAT_SELECTION_REAL_CORR=${OUTPUT_DIR}/fig_feature_selection_weights.png
+FIG_FEAT_SELECTION_SIM_RANK=${OUTPUT_DIR}/fig_feature_selection_sim_rank.png
+FIG3_OUTPUT=$(FIG_FEAT_SELECTION_REAL_CORR) $(FIG_FEAT_SELECTION_SIM_RANK)
 
 # Main target starts here
 # All the outputs
@@ -65,4 +66,5 @@ $(FIG3_OUTPUT): ${FIG3_SRC} ${FIG3_CSV}
 	@echo -e "Plotting figure of feature selection comparison... \n"
 	Rscript ${FIG3_SRC} \
 		--csv ${FIG3_CSV} \
-		--output ${FIG_FEAT_SELECTION}
+		--real_output ${FIG_FEAT_SELECTION_REAL_CORR} \
+		--sim_output ${FIG_FEAT_SELECTION_SIM_RANK}
