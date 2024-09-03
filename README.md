@@ -23,3 +23,7 @@ Sep 5-6 @Seattle University of Washington
 **Spearman rank correlation between feature weights in real datasets**
 
 ![](figures/fig_feature_selection_weights.png)
+
+**Ranking feature weights on simulated datasets stratified by effect and correlation**
+
+![](figures/fig_feature_selection_sim_rank.png
