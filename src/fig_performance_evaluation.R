@@ -93,7 +93,7 @@ wrangle_data <- function(df) {
 # ==================================================
 # First load data and clean it for plotting
 
-#input_path <- "data/metrics.csv"
+input_path <- "data/metrics.csv"
 
 clean_df <- read.csv(input_path) %>%
   as_tibble() %>%
@@ -118,6 +118,7 @@ plot_fig1_real <- function(
     select(method, dataset, ranking) %>%
     pivot_wider(names_from = dataset, values_from = ranking) %>%
     arrange(method) %>%
+    select(order(colnames(.))) %>%
     tibble::column_to_rownames(var="method") %>%
     as.matrix()
 
@@ -130,7 +131,7 @@ plot_fig1_real <- function(
   method_colors <- RColorBrewer::brewer.pal(n=length(methods), method_palette)
   names(method_colors) <- methods
   # For the dataset to use default Pastel1
-  dataset_colors <- RColorBrewer::brewer.pal(n=256, dataset_palette) %>% tail(n=length(datasets))
+  dataset_colors <- RColorBrewer::brewer.pal(n=256, dataset_palette) %>% tail(length(datasets))
   names(dataset_colors) <- datasets
 
   # Then annotations of the heatmap to use

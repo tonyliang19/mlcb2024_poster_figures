@@ -11,6 +11,8 @@ Options:
  --sim_output=S_OUT     Path to write out sim data heatmap on ranking
  --width=WIDTH          Width of the graph [default: 7]
  --height=height        Height of the graph [default: 7]
+ --device=DEVICE        Device to print out [default: png]
+ --dpi=DPI              Dots per inch [default: 300]
 "
 
 # Load libraries
@@ -29,6 +31,9 @@ sim_output_path <- opt$sim_output
 fontsize <- 12
 width <- as.numeric(opt$width)
 height <- as.numeric(opt$height)
+device <- opt$device
+dpi <- as.numeric(opt$dpi)
+
 # convert weights > ranks > spearman corr >
 # heatmap > stratify by sim and real > stratify by tuned params
 
@@ -112,7 +117,7 @@ plot_real_heatmap <- function(
   names(method_colors) <- methods
   # For the dataset to use default Pastel 2
   dataset_palette <- "Pastel1"
-  datasets <- real_df$dataset %>% unique()
+  datasets <- real_df$dataset %>% unique() %>% sort()
   dataset_colors <- RColorBrewer::brewer.pal(n=256, dataset_palette) |> tail(length(datasets))
   names(dataset_colors) <- datasets
   # Col wise
@@ -326,9 +331,9 @@ real_data_heatmap_plot <- plot_real_heatmap(wide_ranking_df, fontsize = fontsize
 sim_data_heatmap_plot <- plot_sim_heatmap(wide_ranking_df, fontsize = fontsize)
 # And save them to disk
 ggsave(real_output_path, plot = real_data_heatmap_plot,
-       width = width, height = height)
+       width = width, height = height, device=device, dpi=dpi)
 ggsave(sim_output_path, plot = sim_data_heatmap_plot,
-       width = width, height = height)
+       width = width, height = height, device=device, dpi=dpi)
 
 message("Saved image of ", width, " x ", height, " to ", real_output_path)
 message("Saved image of ", width, " x ", height, " to ", sim_output_path)
